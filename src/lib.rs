@@ -555,26 +555,22 @@ pub use backtrace::InternalBacktrace;
 
 #[derive(Debug)]
 /// Iterator over the error chain using the `Error::cause()` method.
-pub struct Iter<'a>(Option<&'a error::Error>);
+pub struct Iter<'a>(Option<&'a (dyn error::Error + 'static)>);
 
 impl<'a> Iter<'a> {
     /// Returns a new iterator over the error chain using `Error::cause()`.
-    pub fn new(err: Option<&'a error::Error>) -> Iter<'a> {
+    pub fn new(err: Option<&'a (dyn error::Error + 'static)>) -> Iter<'a> {
         Iter(err)
     }
 }
 
 impl<'a> Iterator for Iter<'a> {
-    type Item = &'a error::Error;
+    type Item = &'a (dyn error::Error + 'static);
 
-    fn next<'b>(&'b mut self) -> Option<&'a error::Error> {
-        match self.0.take() {
-            Some(e) => {
-                self.0 = e.cause();
-                Some(e)
-            }
-            None => None,
-        }
+    fn next<'b>(&'b mut self) -> Option<Self::Item> {
+        let current = self.0;
+        self.0 = self.0.and_then(error::Error::source);
+        current
     }
 }
 

@@ -179,8 +179,13 @@ macro_rules! impl_error_chain_processed {
                 self.description()
             }
 
-            #[allow(unknown_lints, renamed_and_removed_lints, unused_doc_comment, unused_doc_comments)]
+            #[inline]
             fn cause(&self) -> Option<&::std::error::Error> {
+                self.source()
+            }
+
+            #[allow(unknown_lints, renamed_and_removed_lints, unused_doc_comment, unused_doc_comments)]
+            fn source(&self) -> Option<&(::std::error::Error + 'static)> {
                 match self.1.next_error {
                     Some(ref c) => Some(&**c),
                     None => {
@@ -188,7 +193,7 @@ macro_rules! impl_error_chain_processed {
                             $(
                                 $(#[$meta_foreign_links])*
                                 $error_kind_name::$foreign_link_variant(ref foreign_err) => {
-                                    foreign_err.cause()
+                                    foreign_err.source()
                                 }
                             ) *
                             _ => None

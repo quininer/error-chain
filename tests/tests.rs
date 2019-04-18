@@ -294,7 +294,7 @@ mod foreign_link_test {
             "Foreign error description"
         }
 
-        fn cause(&self) -> Option<&::std::error::Error> {
+        fn source(&self) -> Option<&(::std::error::Error + 'static)> {
             Some(&self.cause)
         }
     }
@@ -347,7 +347,7 @@ mod foreign_link_test {
     fn finds_cause() {
         let chained_error = try_foreign_error().err().unwrap();
         assert_eq!(format!("{}", ForeignErrorCause {}),
-                   format!("{}", ::std::error::Error::cause(&chained_error).unwrap()));
+                   format!("{}", ::std::error::Error::source(&chained_error).unwrap()));
     }
 
     #[test]
