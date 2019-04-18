@@ -3,6 +3,8 @@
 #[macro_use]
 extern crate error_chain;
 
+extern crate failure;
+
 #[test]
 fn smoke_test_1() {
     error_chain! {
@@ -640,4 +642,38 @@ fn trailing_comma_in_errors_impl() {
             }
         }
     };
+}
+
+#[test]
+fn failure_to_error_chain() {
+    error_chain! {
+        links { }
+
+        foreign_links {
+            Fail(::failure::Compat<::failure::Error>);
+        }
+
+        errors { }
+    }
+
+    fn foo() -> Result<()> {
+        Err(::failure::err_msg("Test").compat())?;
+        Ok(())
+    }
+}
+
+#[test]
+fn error_chain_to_failure() {
+    error_chain! {
+        links { }
+
+        foreign_links { }
+
+        errors { }
+    }
+
+    fn foo() -> ::failure::Fallible<()> {
+        Err(Error::from("Test"))?;
+        Ok(())
+    }
 }

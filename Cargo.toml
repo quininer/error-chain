@@ -24,3 +24,6 @@ example_generated = []
 
 [dependencies]
 backtrace = { version = "0.3.3", optional = true }
+
+[dev-dependencies]
+failure = "0.1"
